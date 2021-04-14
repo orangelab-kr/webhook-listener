@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+enum WebhookType {
+  rideEnd
+  payment
+  refund
+}
+
+model WebhookModel {
+  webhookId String @id @default(uuid())
+
+  type       WebhookType
+  platformId String
+  url        String
+  requests   RequestModel[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model RequestModel {
+  requestId String @id @default(uuid())
+
+  webhookId String
+  webhook   WebhookModel @relation(fields: [webhookId], references: [webhookId])
+  data      String
+
+  histories HistoryModel[]
+
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+}
+
+model HistoryModel {
+  historyId String @id @default(uuid())
+
+  requestId String
+  request   RequestModel @relation(fields: [requestId], references: [requestId])
+
+  statusCode Int
+  body       String
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+}
