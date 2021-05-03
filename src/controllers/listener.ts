@@ -57,7 +57,7 @@ export class Listener {
       method: 'POST',
       url: webhook.url,
       throwHttpErrors: false,
-      json: JSON.parse(request.data),
+      json: JSON.parse(request),
       headers: {
         'User-Agent': `hikick-webhook/${version} (http://hikick.kr)`,
         'X-Webhook-Request-Id': request.requestId,
