@@ -50,6 +50,8 @@ export class Listener {
     if (!message || !this.channel) return;
     const version = process.env.npm_package_version;
     const request: RequestModel = JSON.parse(message.content.toString());
+    request.data = JSON.parse(request.data.toString());
+
     const webhook = await Webhook.getWebhook(request.webhookId);
     if (!webhook) return;
 
@@ -57,7 +59,7 @@ export class Listener {
       method: 'POST',
       url: webhook.url,
       throwHttpErrors: false,
-      json: JSON.parse(request),
+      json: request,
       headers: {
         'User-Agent': `hikick-webhook/${version} (http://hikick.kr)`,
         'X-Webhook-Request-Id': request.requestId,
