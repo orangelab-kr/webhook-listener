@@ -1,5 +1,5 @@
 import { History } from './history';
-import { RequestModel } from '.prisma/client';
+import { RequestModel } from '@prisma/client';
 import { Webhook } from './webhook';
 import amqplib from 'amqplib';
 import got from 'got';
