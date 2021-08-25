@@ -1,8 +1,5 @@
 import * as Sentry from '@sentry/node';
-
-import { Database, InternalError, logger } from './tools';
-
-import { Listener } from './controllers';
+import { Database, InternalError, Listener, logger } from '.';
 
 export * from './controllers';
 export * from './tools';

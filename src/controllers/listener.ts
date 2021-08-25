@@ -3,7 +3,7 @@ import { RequestModel } from '@prisma/client';
 import { Webhook } from './webhook';
 import amqplib from 'amqplib';
 import got from 'got';
-import { logger } from '../tools';
+import { clusterInfo, logger } from '../tools';
 
 export class Listener {
   public readonly exchange = 'requests';
@@ -48,11 +48,10 @@ export class Listener {
     message: amqplib.ConsumeMessage | null
   ): Promise<void> {
     if (!message || !this.channel) return;
-    const version = process.env.npm_package_version;
     const request: RequestModel = JSON.parse(message.content.toString());
     request.data = JSON.parse(request.data.toString());
-
     const webhook = await Webhook.getWebhook(request.webhookId);
+    const { name, version, author } = clusterInfo;
     if (!webhook) return;
 
     const res = await got({
@@ -61,7 +60,7 @@ export class Listener {
       throwHttpErrors: false,
       json: request,
       headers: {
-        'User-Agent': `hikick-webhook/${version} (http://hikick.kr)`,
+        'User-Agent': `${name}/${version} (${author})`,
         'X-Webhook-Request-Id': request.requestId,
       },
     });
