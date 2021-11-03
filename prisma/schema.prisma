@@ -4,15 +4,15 @@ datasource db {
 }
 
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "rhel-openssl-1.0.x"]
-  previewFeatures = ["nApi"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 enum WebhookType {
   rideEnd
   payment
   refund
+  speedChange
 }
 
 model WebhookModel {
@@ -20,7 +20,7 @@ model WebhookModel {
 
   type       WebhookType
   platformId String
-  url        String
+  url        String         @db.Text
   requests   RequestModel[]
 
   createdAt DateTime  @default(now())
@@ -33,7 +33,7 @@ model RequestModel {
 
   webhookId String
   webhook   WebhookModel @relation(fields: [webhookId], references: [webhookId])
-  data      String
+  data      String       @db.Text
 
   histories HistoryModel[]
 
@@ -50,7 +50,7 @@ model HistoryModel {
   request   RequestModel @relation(fields: [requestId], references: [requestId])
 
   statusCode Int
-  body       String
+  body       String @db.Text
 
   createdAt DateTime  @default(now())
   deletedAt DateTime?

@@ -16,7 +16,7 @@ export class InternalError extends Error {
   public static async registerSentry(): Promise<void> {
     const dsn = process.env.SENTRY_DSN;
     if (!dsn) {
-      logger.warn('[Error] Sentry를 활성화할 수 없습니다.');
+      logger.warn('Error / Sentry를 활성화할 수 없습니다.');
       return;
     }
 
@@ -26,6 +26,6 @@ export class InternalError extends Error {
       integrations: [new Sentry.Integrations.Http({ tracing: true })],
     });
 
-    logger.info(`[Error] Sentry가 활성화되었습니다. (DSN: ${dsn})`);
+    logger.info(`Error / Sentry가 활성화되었습니다. (DSN: ${dsn})`);
   }
 }

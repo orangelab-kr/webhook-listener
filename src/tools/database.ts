@@ -33,9 +33,9 @@ export class Database {
         return next(params);
       });
 
-      logger.info('[Database] 데이터베이스와 연결되었습니다.');
-    } catch (err) {
-      logger.error('[Database] 데이터베이스에 연결할 수 없습니다.');
+      logger.info('Database / 데이터베이스와 연결되었습니다.');
+    } catch (err: any) {
+      logger.error('Database / 데이터베이스에 연결할 수 없습니다.');
       throw err;
     }
   }
