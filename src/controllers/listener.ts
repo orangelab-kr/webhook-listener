@@ -1,8 +1,9 @@
 import { History } from './history';
 import { RequestModel } from '@prisma/client';
+import * as Sentry from '@sentry/node';
 import { Webhook } from './webhook';
 import amqplib from 'amqplib';
-import got from 'got';
+import got, { Response } from 'got';
 import { clusterInfo, logger } from '../tools';
 
 export class Listener {
@@ -54,19 +55,34 @@ export class Listener {
     const { name, version, author } = clusterInfo;
     if (!webhook) return;
 
-    const res = await got({
-      method: 'POST',
-      url: webhook.url,
-      throwHttpErrors: false,
-      json: request,
-      headers: {
-        'User-Agent': `${name}/${version} (${author})`,
-        'X-Webhook-Request-Id': request.requestId,
-      },
-    });
+    let res: { statusCode: number; body: string } | undefined;
+    try {
+      res = await got({
+        method: 'POST',
+        url: webhook.url,
+        throwHttpErrors: false,
+        json: request,
+        headers: {
+          'User-Agent': `${name}/${version} (${author})`,
+          'X-Webhook-Request-Id': request.requestId,
+        },
+      });
+    } catch (err: any) {
+      const eventId = Sentry.captureException(err);
+      res = { statusCode: -1, body: `Unknown Error (${eventId})` };
+    }
 
     const { statusCode, body } = res;
     await History.createHistory(request, { statusCode, body });
+    if (res.statusCode >= 200 && res.statusCode < 300) {
+      this.channel.ack(message);
+      logger.info(
+        `${request.requestId}(${webhook.url}) - 웹훅 요청을 완료했습니다.`
+      );
+
+      return;
+    }
+
     if (message.fields.redelivered) {
       this.channel.ack(message);
       logger.error(
@@ -76,18 +92,9 @@ export class Listener {
       return;
     }
 
-    if (res.statusCode < 200 || res.statusCode >= 300) {
-      this.channel.nack(message, true, true);
-      logger.warn(
-        `${request.requestId}(${webhook.url}) - 웹훅 요청에 실패하였습니다. (재시도 예정)`
-      );
-
-      return;
-    }
-
-    this.channel.ack(message);
-    logger.info(
-      `${request.requestId}(${webhook.url}) - 웹훅 요청을 완료했습니다.`
+    this.channel.nack(message, true, true);
+    logger.warn(
+      `${request.requestId}(${webhook.url}) - 웹훅 요청에 실패하였습니다. (재시도 예정)`
     );
   }
 }
