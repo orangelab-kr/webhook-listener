@@ -4,12 +4,7 @@
   "containerDefinitions": [
     {
       "dnsSearchDomains": null,
-      "environmentFiles": [
-        {
-          "value": "arn:aws:s3:::hikick-production/webhook-listener/.env",
-          "type": "s3"
-        }
-      ],
+      "environmentFiles": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "secretOptions": null,
