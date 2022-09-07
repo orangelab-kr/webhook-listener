@@ -23,9 +23,8 @@ model WebhookModel {
   url        String         @db.Text
   requests   RequestModel[]
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model RequestModel {
@@ -40,7 +39,6 @@ model RequestModel {
   completedAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  deletedAt   DateTime?
 }
 
 model HistoryModel {
@@ -52,6 +50,5 @@ model HistoryModel {
   statusCode Int
   body       String @db.Text
 
-  createdAt DateTime  @default(now())
-  deletedAt DateTime?
+  createdAt DateTime @default(now())
 }

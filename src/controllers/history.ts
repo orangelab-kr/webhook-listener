@@ -35,6 +35,6 @@ export class History {
 
   private static getPreviewText(str: string, limit = 100): string {
     if (str.length <= limit) return str;
-    return str.substr(0, limit) + '...';
+    return str.substring(0, limit) + '...';
   }
 }
